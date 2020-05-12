@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--COMMEMT-->
+<html>
+  <head>
+	<script type="text/javascript">
+	
+		window.onload = doStuff;
+		function doStuff() {
+		var res=document.getElementById("res");
+		res.style.display='none';
+		var loading=document.getElementById("loading");
+		loading.style.display='none';
+
+		}
+		function readURL(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					$('.image-upload-wrap').hide();
+					$('.file-upload-image').attr('src', e.target.result);
+					$('.file-upload-content').show();
+					$('.image-title').html(input.files[0].name);
+						image_url = reader.result 
+						preview.src = image_url;
+					console.log(image_url)
+				};
+				reader.readAsDataURL(input.files[0]);
+			} else {
+			removeUpload();
+			}
+		}
+
+		function removeUpload() {
+			res.style.display='none';
+			loading.style.display='none';
+			$('.file-upload-input').replaceWith($('.file-upload-input').clone());
+			$('.file-upload-content').hide();
+			$('.image-upload-wrap').show();
+		}
+		$('.image-upload-wrap').bind('dragover', function () {
+			$('.image-upload-wrap').addClass('image-dropping');
+		});
+		$('.image-upload-wrap').bind('dragleave', function () {
+			$('.image-upload-wrap').removeClass('image-dropping');
+		});
+
+		async function start(cur_mode) {
+		//arabic or english
+		mode = cur_mode
+
+		//load the class names
+		await loadDict()
+		}
+		function previewFile(){
+		   var preview = document.querySelector('img'); //selects the query named img
+		   var file    = document.querySelector('input[type=file]').files[0]; //same as here
+		   var reader  = new FileReader();
+				   reader.onloadend = function () {
+					   image_url = reader.result 
+					   preview.src = image_url;
+					   console.log(image_url)
+				   }
+				   if (file) {
+					   reader.readAsDataURL(file); //reads the data as a URL
+				   } else {
+					   preview.src = "";
+				   }
+			  }
+
+		function classify() {
+			res.innerHTML = "" ;
+			loading.style.display='block';
+			var url="classify?imageurl=" + image_url;
+			$.get(url, function(data, status){
+			res.style.display='block';
+			loading.style.display='none';
+			res.innerHTML = data.results[0].class_name;
+			
+			});
+		};
+
+		   previewFile();
+
+    </script>
+	   
+	<title>Dog Breed</title>
+	<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+	</head>
+<body>
+<h1>Dog Breed Classifier</h1>
+<fieldset>
+	<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<div class="file-upload">
+  <button class="add-image-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
+
+  <div class="image-upload-wrap">
+    <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+    <div class="drag-text">
+      <h3>Drag and drop an Image</h3>
+    </div>
+  </div>
+  <div class="file-upload-content">
+    <img class="file-upload-image" src="#" alt="your image" />
+    <div class="image-title-wrap">
+      <button type="button" onclick="removeUpload()" class="remove-image">Remove</button>
+    </div>
+  </div>
+		<button id="btn_search" class="myButton" onclick="classify();" type="button">GO</button>
+		<br><br>
+		
+		<div class="lds-ripple"><div></div><div></div></div>
+		<div id="loading" class="table"> Recognizing . . . Please Wait. . .</div>
+		<div id="res" class="table"></div>
+
+	</div>
+	</fieldset>
+</body>
+
